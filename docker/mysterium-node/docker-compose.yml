@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  myst-node:
+    build: .
+    container_name: myst-node
+    environment:
+      - MYST_KEY=${MYST_KEY}
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
