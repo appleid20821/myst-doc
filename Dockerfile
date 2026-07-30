@@ -1,19 +1,14 @@
-FROM ubuntu:22.04
+#!/bin/bash
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV container=docker
+echo "=== Mysterium Node Docker Container ==="
 
-RUN apt-get update && apt-get install -y \
-    curl \
-    gnupg \
-    wireguard \
-    && rm -rf /var/lib/apt/lists/*
+if [ -z "$MYST_KEY" ]; then
+    echo "Error: MYST_KEY (wallet address) must be set."
+    echo "Set MYST_KEY in Railway environment variables."
+    exit 1
+fi
 
-RUN curl -fsSL https://ppa.mysterium.network/public-key | gpg --dearmor -o /etc/apt/keyrings/mysterium.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/mysterium.gpg] https://ppa.mysterium.network/mysteriumnetwork/node/ubuntu focal main" > /etc/apt/sources.list.d/mysterium.list && \
-    apt-get update && apt-get install -y -o Dpkg::Options::="--force-overwrite" myst
+echo "Starting Mysterium Node..."
+echo "Wallet: $MYST_KEY"
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-CMD ["/entrypoint.sh"]
+exec myst daemon --agreed-terms-of-use --log-level info --address 0.0.0.0 --restapi 0.0.0.0:4449
