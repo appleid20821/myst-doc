@@ -7,7 +7,7 @@ fi
 
 PORT=${PORT:-4449}
 
-myst daemon --tequilapi.port=$PORT &
+myst --tequilapi.port=$PORT daemon &
 sleep 6
 
 IDENTITY=$(myst cli identities 2>/dev/null | grep -oP '0x[a-fA-F0-9]{40}' | head -1)
