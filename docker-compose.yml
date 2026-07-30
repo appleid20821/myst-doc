@@ -7,18 +7,11 @@ services:
     environment:
       - MYST_KEY=${MYST_KEY}
     restart: unless-stopped
-    privileged: true
-    volumes:
-      - myst_data:/root/.mysteriumium
     cap_add:
       - NET_ADMIN
       - NET_RAW
-      - SYS_MODULE
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
-
-volumes:
-  myst_data:
