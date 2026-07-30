@@ -5,13 +5,22 @@ ENV container=docker
 
 RUN apt-get update && apt-get install -y \
     curl \
-    gnupg \
+    ca-certificates \
     wireguard \
+    iptables \
+    iproute2 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://ppa.mysterium.network/public-key | gpg --dearmor -o /etc/apt/keyrings/mysterium.gpg
-RUN echo "deb [signed-by=/etc/apt/keyrings/mysterium.gpg] https://ppa.mysterium.network/mysteriumnetwork/node/ubuntu focal main" > /etc/apt/sources.list.d/mysterium.list
-RUN apt-get update && apt-get install -y -o Dpkg::Options::="--force-overwrite" myst
+RUN mkdir -p /tmp/myst && \
+    curl -fsSL https://github.com/mysteriumnetwork/node/releases/latest/download/myst_linux_amd64.tar.gz \
+    -o /tmp/myst.tar.gz && \
+    tar -xzf /tmp/myst.tar.gz -C /tmp/myst && \
+    cp /tmp/myst/myst /usr/local/bin/ && \
+    cp /tmp/myst/myst_supervisor /usr/local/bin/ 2>/dev/null || true && \
+    mkdir -p /etc/mysterium-node && \
+    cp -r /tmp/myst/config/* /etc/mysterium-node/ 2>/dev/null || true && \
+    rm -rf /tmp/myst.tar.gz /tmp/myst && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY docker/mysterium-node/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
